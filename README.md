@@ -1,5 +1,5 @@
 # Introduction 
-TODO: Give a short introduction of your project. Let this section explain the objectives or the motivation behind this project. 
+This project is meant to provide a Gitops method of syncing the departments section of your Jamf Pro server using a configuration file as your source of truth. The script will update , create or delete departments based on what is provided in the configuration file. A yaml configuration file is also provided to easily apply this within your devops organization if need be 
 
 # Getting Started
 TODO: Guide users through getting your code up and running on their own system. In this section you can talk about:
