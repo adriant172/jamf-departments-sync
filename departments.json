@@ -1,0 +1,51 @@
+{
+    "departments": [
+        {
+            "id": "1",
+            "name": "AZSA-ITS"
+        },
+        {
+            "id": "2",
+            "name": "KIT-ITS"
+        },
+        {
+            "id": "3",
+            "name": "Department of Trevor"
+        },
+        {
+            "id": "10",
+            "name": "Department of Matt"
+        },
+        {
+            "id": "13",
+            "name": "Department of Pain - Trevor"
+        },
+        {
+            "id": "14",
+            "name": "Department of Perpetual Renaming - Trevor"
+        },
+        {
+            "id": "19",
+            "name": "Department of Pain - Matt"
+        },
+        {
+            "id": "20",
+            "name": "Department of Perpetual Renaming - Matt"
+        },
+        {
+            "id": "23",
+            "name": "Department of Redemption - Matt"
+        },
+        {
+            "id": "24",
+            "name": "Department of Glory - Matt"
+        },
+        {
+            "id": "25",
+            "name": "Department of Testing 3 - Matt"
+        },
+        {
+            "name": "Department of Testing Triggers - Matt"
+        }
+    ]
+}

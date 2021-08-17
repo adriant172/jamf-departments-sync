@@ -1,0 +1,39 @@
+name: $(TeamProject)_$(BuildDefinitionName)_$(SourceBranchName)_$(Date:yyyyMMdd)$(Rev:.r)
+ 
+trigger:
+  branches:
+    include:
+      - main
+  paths:
+    include:
+      - departments.json ## Update this line to the correct value!!! 
+variables:
+  - group: 'Jamf-Variables'
+ 
+pool:
+  vmImage: ubuntu-18.04
+ 
+stages:
+  - stage: main
+    displayName: Synchronization Pipeline
+    dependsOn: []
+    jobs:
+      - job: syncJob
+        displayName: Sync JAMF config to API
+        steps:
+          # Python script
+          # Run a Python file or inline script
+          - task: UsePythonVersion@0
+            inputs:
+              versionSpec: '3.9'
+              addToPath: true
+              architecture: 'x64' # Options: x86, x64 (this argument applies only on Windows agents)
+          
+          - script: pip3 install requests    
+            
+          - task: PythonScript@0
+            inputs:
+              scriptSource: 'filePath' # Options: filePath, inline
+              scriptPath: $(System.DefaultWorkingDirectory)/sync-departments.py
+              arguments: '$(System.DefaultWorkingDirectory)/departments.json $(jamfcloud-space-domain) $(jamf-api-username) $(jamf-api-password)'
+              failOnStderr: true # Optional
