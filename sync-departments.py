@@ -30,7 +30,7 @@ def jamf_token(username, password, url):
     token = resp["token"]
     return token
 
-def add_departments(departments, token):
+def add_department(department, token):
     endpoint = "uapi/v1/departments"
     current_url = url + endpoint
     headers = {
@@ -38,13 +38,16 @@ def add_departments(departments, token):
     "Content-Type": "application/json",
     "Authorization": "Bearer " + token
             }
+    data = {"name": department}
+    response = requests.request("POST", url=current_url,json=data, headers=headers)
+    print(response.text)
+
+def add_departments(departments, token):
     current_departments = get_departments(token)
     current_dept_names = [i['name'] for i in current_departments]
     departments_to_create = [i for i in departments if i not in current_dept_names]
     for department in departments_to_create:
-        data = {"name": department}
-        response = requests.request("POST", url=current_url,json=data, headers=headers)
-        print(response.text)
+        add_department(department, token)
 
 def get_departments(token):
     endpoint = "uapi/v1/departments"
@@ -134,6 +137,17 @@ def get_all_departmant_history(token):
 
 tok = jamf_token(username, password, url)
 
+
+
+
+## Grab the list of departments from the config file
+## Grab the current jamf departments  create lists for the ids and department names to iterate through
+ ## Iterate through the current jamf department and config file department names , check if the config file department names exist within jamf. If not create a new department 
+ ## Iterate through the current jamf departments , check if any of departments do no exist in the config file. If it does not exist delete the department from jamf 
+ ## Iterate through config file department id's , then check for the same id in the current jamf departments. Check if the name of the department is the same, if not change the name in jamf to the one specified in the config file 
+ 
+
+## Create name and id lists for the config file departments
 for dept in dept_file["departments"]:
     config_file_dept_names.append(dept["name"])
     try:
@@ -141,28 +155,43 @@ for dept in dept_file["departments"]:
     except:
         continue
 
+## Create name and id lists for current jamf departments
 current_jamf_depts = get_departments(tok)
 current_dept_names = [i['name'] for i in current_jamf_depts]
 current_dept_ids = [i['id'] for i in current_jamf_depts]
 
-add_departments(config_file_dept_names, tok)
 
-for dept in current_dept_names:
-    if dept not in config_file_dept_names:
-        delete_department(dept, tok)
-
+## Update
 for dept in current_jamf_depts:
     for config_dept in dept_file["departments"]:
         if 'id' not in config_dept:
             continue
-        if config_dept["id"] == dept["id"]:
-            if config_dept["name"] != dept["name"]:
-                update_department(dept["name", config_dept["name"], tok])
+        if dept["id"] == config_dept["id"]:
+            # print(dept["id"]+ ": " + dept["name"]+ ": " + config_dept["name"])
+            if dept["name"] != config_dept["name"]:
+                current_dept_id = dept["id"]
+                print(f"Caution: Department with id:{current_dept_id} needs to be renamed!")
+                update_department(dept["name"], config_dept["name"], tok)
+
+## Create
+for config_dept in dept_file["departments"]:
+    if config_dept["name"] not in current_dept_names and 'id' not in config_dept:
+        print("create: " + config_dept["name"])
+        add_department(config_dept["name"], tok)
+
+## Delete
+for dept in current_jamf_depts:
+    if dept["name"] not in config_file_dept_names and dept["id"] not in config_file_dept_ids:
+        print("Delete: " + dept["name"])
+        delete_department(dept["name"], tok)
 
 
+            
+## Grab the history of the departments section in jamf
 all_departments = get_all_departmant_history(tok)
 departments_history_json = {"logs": []}
 
+## Convert department history ine easily readable format 
 for deptName in all_departments:
      for history_item in all_departments[deptName]:
          log_item = {"Department ID": f"{history_item['ID']}", "Department Name": f"{history_item['Name']}","User Making Change": f"{history_item['Changed By']}", "Type of Change": f"{history_item['Change Type']}", "Change date": f"{history_item['Date']}"}
@@ -171,6 +200,7 @@ for deptName in all_departments:
 
 from datetime import datetime
 date = datetime.now().strftime("%Y-%m-%d")
+
 
 print(json.dumps(departments_history_json, indent=4, sort_keys=True))
 

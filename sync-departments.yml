@@ -6,7 +6,7 @@ trigger:
       - main
   paths:
     include:
-      - departments.json ## Update this line to the correct value!!! 
+      - departments.json ## Update this line to the correct value
 variables:
   - group: 'Jamf-Variables'
  
